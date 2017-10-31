@@ -1,5 +1,6 @@
 package mx.itesm.csf.indoorapp;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -9,7 +10,12 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
+import com.estimote.coresdk.service.BeaconManager;
+
 public class zones extends AppCompatActivity {
+    private BeaconManager beaconManager; //The beacon manager who is going to monitor and range the beacons
+    private BeaconRegion region;    //The template of region that will follow specific beacons according to the features of it
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,8 +23,11 @@ public class zones extends AppCompatActivity {
         setContentView(R.layout.activity_zones);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Registered Zones: ");
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setBackgroundColor( -16776961);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -26,6 +35,8 @@ public class zones extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        beaconManager = new BeaconManager(getApplicationContext()); //Estimote beacons manager to manage beacons
     }
 
     @Override
