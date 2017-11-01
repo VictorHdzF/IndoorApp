@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/IndoorApp.iml" filepath="$PROJECT_DIR$/IndoorApp.iml" />
+      <module fileurl="file://C:\Users\VictorHF-PC\AndroidStudioProjects\IndoorApp\IndoorApp\IndoorApp.iml" filepath="C:\Users\VictorHF-PC\AndroidStudioProjects\IndoorApp\IndoorApp\IndoorApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\VictorHF-PC\AndroidStudioProjects\IndoorApp\IndoorApp\app\app.iml" filepath="C:\Users\VictorHF-PC\AndroidStudioProjects\IndoorApp\IndoorApp\app\app.iml" />
     </modules>
   </component>
 </project>
