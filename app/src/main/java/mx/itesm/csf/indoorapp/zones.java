@@ -10,16 +10,37 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.estimote.coresdk.common.config.EstimoteSDK;
+import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
+import com.estimote.coresdk.observation.region.Region;
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
+import com.estimote.coresdk.recognition.packets.Beacon;
+import com.estimote.coresdk.recognition.packets.ConfigurableDevice;
+import com.estimote.coresdk.recognition.packets.DeviceType;
 import com.estimote.coresdk.service.BeaconManager;
+
+import java.util.UUID;
 
 public class zones extends AppCompatActivity {
     private BeaconManager beaconManager; //The beacon manager who is going to monitor and range the beacons
     private BeaconRegion region;    //The template of region that will follow specific beacons according to the features of it
+    private static final int NUM_BEACONS = 12;  //Number of beacons to use in the warehouse, in next delivery will be pulled from DB maybe
+    BeaconRegion[] BeaconRegions = new BeaconRegion[NUM_BEACONS];   //Array of BeaconRegions to monitor while the app is working (Zones)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        EstimoteSDK.initialize(getApplicationContext(), "warehouse-ge-gmail-com-s-b-dpm", "3a35682f21bd1cad60f8ecd9e2a4fc70");  //Initialize application context from estimote
+
+        beaconManager = new BeaconManager(getApplicationContext()); //Estimote beacons manager to manage beacons
+
+        for(int i = 0; i < NUM_BEACONS; i++)
+            BeaconRegions[i] = new BeaconRegion("ranged region " + (i+1), UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), 12, i+1);
+
+        region = new BeaconRegion("ranged region",UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), null, null); //Setting the features for the ranging region
+
+
         setContentView(R.layout.activity_zones);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -35,9 +56,8 @@ public class zones extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
-        beaconManager = new BeaconManager(getApplicationContext()); //Estimote beacons manager to manage beacons
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
