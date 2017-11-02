@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,7 +30,15 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.estimote.coresdk.common.config.EstimoteSDK;
+import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
+import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
+import com.estimote.coresdk.recognition.packets.Beacon;
+import com.estimote.coresdk.service.BeaconManager;
+
 import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 
 public class MainActivity extends ActionBarActivity
@@ -37,8 +46,14 @@ public class MainActivity extends ActionBarActivity
 
     //Create Objects.
     private ListView myList;
+    private TextView closestBeaconTV;
     private ListAdapter todoListAdapter;
     private TodoListSQLHelper todoListSQLHelper;
+
+    // Estimote SDK Objects for Ranging
+    private BeaconManager beaconManager;
+    private BeaconRegion region;
+    private int highestRssiMinor;
 
 
     /**
@@ -55,6 +70,27 @@ public class MainActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        beaconManager = new BeaconManager(this);
+        EstimoteSDK.enableDebugLogging(true);
+        region = new BeaconRegion("ranged region", UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), 12, null);
+
+        closestBeaconTV = (TextView) findViewById(R.id.preview_beacon);
+
+        beaconManager.setForegroundScanPeriod(200,0);
+
+        beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener() {
+            @Override
+        public void onBeaconsDiscovered(BeaconRegion region, List<Beacon> list) {
+            if (!list.isEmpty()) {
+                Log.d("MainActivity", "Hello");
+                highestRssiMinor = list.get(0).getMinor();
+                closestBeaconTV.setText("Minor: " + String.valueOf(highestRssiMinor) + "  RSSI: "  + String.valueOf(list.get(0).getRssi()) );
+            }
+        }
+    });
+
+        beaconManager.startRanging(region);
 
         myList = (ListView) findViewById(R.id.list);
         ImageButton fabImageButton = (ImageButton) findViewById(R.id.fab_image_button);
@@ -102,6 +138,9 @@ public class MainActivity extends ActionBarActivity
         fabImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, beaconInfo.class);
+                startActivity(intent);
+                /*
                 list.add("New Item");
                 adapter.notifyDataSetChanged();
                 AlertDialog.Builder todoTaskBuilder = new AlertDialog.Builder(MainActivity.this);
@@ -129,7 +168,7 @@ public class MainActivity extends ActionBarActivity
 
                 todoTaskBuilder.setNegativeButton("Cancel", null);
 
-                todoTaskBuilder.create().show();
+                todoTaskBuilder.create().show();*/
             }
         });
 
@@ -138,6 +177,25 @@ public class MainActivity extends ActionBarActivity
         // a view to represent an item in that data set.
 
         updateTodoList();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SystemRequirementsChecker.checkWithDefaultDialogs(this);
+        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                beaconManager.startRanging(region);
+            }
+        });
+    }
+
+    // Template del SDK
+    @Override
+    protected void onPause() {
+        beaconManager.stopRanging(region);
+        super.onPause();
     }
 
     @Override
@@ -187,61 +245,6 @@ public class MainActivity extends ActionBarActivity
             return true;
         }
         return super.onCreateOptionsMenu(menu);
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        //noinspection SimplifiableIfStatement
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            ArrayList<String> list = new ArrayList<>();
-
-            MyCustomAdapter adapter = new MyCustomAdapter(this, list);
-
-            list.add("New Item");
-            adapter.notifyDataSetChanged();
-            AlertDialog.Builder todoTaskBuilder = new AlertDialog.Builder(MainActivity.this);
-            todoTaskBuilder.setTitle("Add List Item.");
-            todoTaskBuilder.setMessage("Describe the item.");
-            final EditText todoET = new EditText(MainActivity.this);
-            todoTaskBuilder.setView(todoET);
-            todoTaskBuilder.setPositiveButton("Add Task", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    String todoTaskInput = todoET.getText().toString();
-                    todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
-                    SQLiteDatabase sqLiteDatabase = todoListSQLHelper.getWritableDatabase();
-                    ContentValues values = new ContentValues();
-                    values.clear();
-
-                    //write the Todo task input into database table
-                    values.put(TodoListSQLHelper.COL1_TASK, todoTaskInput);
-                    sqLiteDatabase.insertWithOnConflict(TodoListSQLHelper.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
-
-                    //update the Todo task list UI
-                    updateTodoList();
-                    sqLiteDatabase.close();
-
-                }
-            });
-
-            todoTaskBuilder.setNegativeButton("Cancel", null);
-
-            todoTaskBuilder.create().show();
-
-
-            //show the ListView on the screen
-            // The adapter MyCustomAdapter is responsible for maintaining the data backing this list and for producing
-            // a view to represent an item in that data set.
-
-            updateTodoList();
-            return true;
-
-        }
-        return super.onOptionsItemSelected(item);
-
     }
 
     /**
