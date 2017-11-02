@@ -55,7 +55,6 @@ public class MainActivity extends ActionBarActivity
     private BeaconRegion region;
     private int highestRssiMinor;
 
-
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
