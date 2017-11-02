@@ -4,10 +4,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import com.estimote.coresdk.recognition.packets.Beacon;
-
-import com.google.gson.Gson;
-
 public class beaconInfo extends AppCompatActivity {
 
     @Override
@@ -15,12 +11,14 @@ public class beaconInfo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.beacon_info);
 
-        final TextView textView3 = (TextView) findViewById(R.id.textView3);
+        final TextView minorTv = (TextView) findViewById(R.id.minorTv);
+        final TextView majorTv = (TextView) findViewById(R.id.majorTv);
 
         // We pull the beacon object
-        Gson gson = new Gson();
-        String beaconDataObjectAsAString = getIntent().getStringExtra("BeaconObjectAsString");
-        textView3.setText(beaconDataObjectAsAString);
-        //Beacon beaconDataObject = gson.fromJson(beaconDataObjectAsAString, Beacon.class);
+        int minor = getIntent().getIntExtra("minorInt", 0);
+        int major = getIntent().getIntExtra("majorInt", 0);
+
+        majorTv.setText(String.valueOf(major));
+        minorTv.setText(String.valueOf(minor));
     }
 }

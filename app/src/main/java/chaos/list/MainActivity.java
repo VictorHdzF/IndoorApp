@@ -11,14 +11,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
@@ -76,14 +71,11 @@ public class MainActivity extends ActionBarActivity
         region = new BeaconRegion("ranged region", UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), 12, null);
 
         closestBeaconTV = (TextView) findViewById(R.id.preview_beacon);
-
         beaconManager.setForegroundScanPeriod(200,0);
-
         beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener() {
             @Override
         public void onBeaconsDiscovered(BeaconRegion region, List<Beacon> list) {
             if (!list.isEmpty()) {
-                Log.d("MainActivity", "Hello");
                 highestBeacon = list.get(0);
                 closestBeaconTV.setText("Minor: " + String.valueOf(highestBeacon.getMinor()) + "  RSSI: "  + String.valueOf(highestBeacon.getRssi()));
             }
@@ -133,15 +125,17 @@ public class MainActivity extends ActionBarActivity
         findViewById(R.id.list).setOnTouchListener(touchListener);
         // Setting this scroll listener is required to ensure that during ListView scrolling,
         // we don't look for swipes.
+
         // findViewById(R.id.list).setOnScrollListener(touchListener.makeScrollListener());
 
         fabImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, beaconInfo.class);
-                Gson gson = new Gson();
-                String BeaconDataObjectAsAString = gson.toJson(highestBeacon);
-                intent.putExtra("BeaconObjectAsString", BeaconDataObjectAsAString);
+                int minor = highestBeacon.getMinor();
+                int major = highestBeacon.getMajor();
+                intent.putExtra("minorInt", minor);
+                intent.putExtra("majorInt", major);
                 startActivity(intent);
             }
         });
