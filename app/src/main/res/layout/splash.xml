@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="fill_parent"
-    android:background="#FFBF3F"
+    android:background="#03A9F4"
     tools:context="chaos.list.Splash">
 
 
@@ -15,7 +15,7 @@
         android:adjustViewBounds="true"
         android:contentDescription="SplashScreen"
         android:cropToPadding="true"
-        app:srcCompat="@drawable/ge" />
+        app:srcCompat="@drawable/indoor_ge_re" />
 
     <ProgressBar
         android:id="@+id/progressbar"
