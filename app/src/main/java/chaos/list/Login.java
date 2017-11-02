@@ -33,14 +33,16 @@ public class Login extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Objects.equals(form.getText().toString(), pass.toString())) {
+                Intent intent = new Intent(Login.this, MainActivity.class);
+                startActivity(intent);
+                /*if (Objects.equals(form.getText().toString(), pass.toString())) {
                     Intent intent = new Intent(Login.this, MainActivity.class);
                     startActivity(intent);
                 }
                 else
                 {
                    Message.message(Login.this, "Wrong Password!");
-                }
+                }*/
             }
         });
 

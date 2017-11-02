@@ -35,6 +35,7 @@ import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
 import com.estimote.coresdk.recognition.packets.Beacon;
 import com.estimote.coresdk.service.BeaconManager;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class MainActivity extends ActionBarActivity
     // Estimote SDK Objects for Ranging
     private BeaconManager beaconManager;
     private BeaconRegion region;
-    private int highestRssiMinor;
+    private Beacon highestBeacon;
 
 
     /**
@@ -84,8 +85,8 @@ public class MainActivity extends ActionBarActivity
         public void onBeaconsDiscovered(BeaconRegion region, List<Beacon> list) {
             if (!list.isEmpty()) {
                 Log.d("MainActivity", "Hello");
-                highestRssiMinor = list.get(0).getMinor();
-                closestBeaconTV.setText("Minor: " + String.valueOf(highestRssiMinor) + "  RSSI: "  + String.valueOf(list.get(0).getRssi()) );
+                highestBeacon = list.get(0);
+                closestBeaconTV.setText("Minor: " + String.valueOf(highestBeacon.getMinor()) + "  RSSI: "  + String.valueOf(highestBeacon.getRssi()));
             }
         }
     });
@@ -139,36 +140,10 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, beaconInfo.class);
+                Gson gson = new Gson();
+                String BeaconDataObjectAsAString = gson.toJson(highestBeacon);
+                intent.putExtra("BeaconObjectAsString", BeaconDataObjectAsAString);
                 startActivity(intent);
-                /*
-                list.add("New Item");
-                adapter.notifyDataSetChanged();
-                AlertDialog.Builder todoTaskBuilder = new AlertDialog.Builder(MainActivity.this);
-                todoTaskBuilder.setTitle("Add a List item.");
-                todoTaskBuilder.setMessage("Describe the item.");
-                final EditText todoET = new EditText(MainActivity.this);
-                todoTaskBuilder.setView(todoET);
-                todoTaskBuilder.setPositiveButton("Add Item", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        String todoTaskInput = todoET.getText().toString();
-                        todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
-                        SQLiteDatabase sqLiteDatabase = todoListSQLHelper.getWritableDatabase();
-                        ContentValues values = new ContentValues();
-                        values.clear();
-
-                        //write the Todo task input into database table
-                        values.put(TodoListSQLHelper.COL1_TASK, todoTaskInput);
-                        sqLiteDatabase.insertWithOnConflict(TodoListSQLHelper.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
-
-                        //update the Todo task list UI
-                        updateTodoList();
-                    }
-                });
-
-                todoTaskBuilder.setNegativeButton("Cancel", null);
-
-                todoTaskBuilder.create().show();*/
             }
         });
 
