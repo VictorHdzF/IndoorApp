@@ -6,17 +6,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.TextView;
 
 public class About extends ActionBarActivity {
-    private WebView mWebView;
+    private TextView aboutTV;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
-        mWebView = (WebView) findViewById(R.id.activity_main_webview);
-        WebSettings webSettings = mWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        mWebView.loadUrl("http://dandroiddeveloper.github.io/list");
+        aboutTV = (TextView) findViewById(R.id.about);
+        aboutTV.setText("La aplicación Warehouse Indoor esta enfocada a la configuración de los BLE Beacons Indoor de Estimote. \n"
+        );
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -30,8 +30,6 @@ public class About extends ActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-
         return super.onOptionsItemSelected(item);
     }
 }

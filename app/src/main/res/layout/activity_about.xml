@@ -3,9 +3,14 @@
     android:layout_height="match_parent"
     tools:context="chaos.list.About"
     >
-    <WebView
-        android:id="@+id/activity_main_webview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
+    <TextView
+        android:id="@+id/about"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
 </RelativeLayout>
