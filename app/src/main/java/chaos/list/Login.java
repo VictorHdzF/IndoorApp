@@ -20,8 +20,6 @@ import java.util.Objects;
 
 public class Login extends AppCompatActivity {
     private String pass = "password";
-    private String id = "0";
-    private LoginPreferences session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,15 +30,10 @@ public class Login extends AppCompatActivity {
         final EditText form = (EditText) findViewById(R.id.editText);
         final Button button = (Button) findViewById(R.id.button1);
 
-        // Session Manager
-        session = new LoginPreferences(getApplicationContext());
-
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (Objects.equals(form.getText().toString(), pass.toString())) {
-                    id = "1";
-                    session.createLoginSession(id);
                     Intent intent = new Intent(Login.this, MainActivity.class);
                     startActivity(intent);
                 }

@@ -11,7 +11,6 @@ import android.widget.ProgressBar;
 
 public class Splash extends AppCompatActivity {
 
-    LoginPreferences session; // Session Manager Class
     ProgressBar mProgress; // Progressbar
 
     @Override
@@ -19,15 +18,10 @@ public class Splash extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash);
         // Session class instance
-        session = new LoginPreferences(getApplicationContext());
         mProgress = (ProgressBar) findViewById(R.id.progressbar);
 
         // Show splash screen and login session if the user is not logged in
-        if (session.isLoggedIn()){
-            startTabbedActivity();
-        }else {
             startSplash();
-        }
     }
 
     private void startSplash() {
@@ -48,11 +42,6 @@ public class Splash extends AppCompatActivity {
                 finish();
             }
         }).start();
-    }
-    private void startTabbedActivity(){
-        Intent intent = new Intent(Splash.this, MainActivity.class);
-        startActivity(intent);
-        finish();
     }
 
     private void startLogin(){
