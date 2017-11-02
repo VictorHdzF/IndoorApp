@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFBF3F"
+    android:background="#03A9F4"
     tools:context="chaos.list.Login">
 
 
@@ -43,6 +43,7 @@
         android:layout_alignStart="@+id/textView2"
         android:layout_below="@+id/textView2"
         android:layout_marginTop="17dp"
+        android:backgroundTint="#4C4C4C"
         android:inputType="textPassword" />
 
     <Button
