@@ -13,6 +13,33 @@
         android:weightSum="1">
 
         <TextView
+            android:id="@+id/zonaLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="Zona:"
+            android:textSize="24sp" />
+
+        <EditText
+            android:id="@+id/zonaEt"
+            android:layout_width="99dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:ems="10"
+            android:hint="Enter Zone"
+            android:inputType="numberDecimal"
+            android:textAlignment="center"
+            android:textSize="24sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <TextView
             android:id="@+id/majorLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
