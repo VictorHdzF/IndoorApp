@@ -1,10 +1,17 @@
 package chaos.list;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -16,13 +23,20 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.estimote.coresdk.common.config.EstimoteSDK;
 import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
+import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
+import com.estimote.coresdk.recognition.packets.Beacon;
+import com.estimote.coresdk.service.BeaconManager;
+import org.altbeacon.beacon.AltBeacon;
 //import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 //import org.altbeacon.beacon.BeaconManager;
@@ -30,9 +44,12 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 
 public class MainActivity extends ActionBarActivity
@@ -41,8 +58,8 @@ public class MainActivity extends ActionBarActivity
     //Create Objects.
     private ListView myList;
     private TextView closestBeaconTV;
-    private ListAdapter listAdapter;
-    private ListSQLHelper listSQLHelper;
+    private ListAdapter todoListAdapter;
+    private TodoListSQLHelper todoListSQLHelper;
 
     // AltBeacon SDK Objects for Ranging
     private org.altbeacon.beacon.BeaconManager beaconManager;
@@ -55,11 +72,17 @@ public class MainActivity extends ActionBarActivity
     //Used to store the last screen title. For use in {@link #restoreActionBar()}.
     private CharSequence mTitle;
 
+    // Network receiver
+    NetworkReceiver networkReceiver;
+
+    // Request to the server
+    Request request;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        listSQLHelper = new ListSQLHelper(MainActivity.this);
-
         super.onCreate(savedInstanceState);
+
+        todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
         setContentView(R.layout.activity_main);
 
         closestBeaconTV = (TextView) findViewById(R.id.preview_beacon);
@@ -67,6 +90,24 @@ public class MainActivity extends ActionBarActivity
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
         beaconManager.bind(this);
+
+        // Network receiver
+        networkReceiver = new NetworkReceiver();
+
+        // Request to the server
+        request = new Request(getApplicationContext());
+
+        // Check Network Broadcast
+        networkBroadcast();
+
+        // Check connectivity to Internet
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            connectivityState(true);
+        } else {
+            connectivityState(false);
+        }
 
         /*
         beaconManager = new org.altbeacon.beacon.BeaconManager(this);
@@ -113,11 +154,11 @@ public class MainActivity extends ActionBarActivity
                             public void onDismiss(ListView listView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
 
-                                    String deleteTodoItemSql = "DELETE FROM " + ListSQLHelper.TABLE_NAME +
-                                            " WHERE " + ListSQLHelper._ID+ " = '" + listAdapter.getItemId(position) + "'";
+                                    String deleteTodoItemSql = "DELETE FROM " + TodoListSQLHelper.TABLE_NAME +
+                                            " WHERE " + TodoListSQLHelper._ID+ " = '" + todoListAdapter.getItemId(position) + "'";
 
-                                    listSQLHelper = new ListSQLHelper(MainActivity.this);
-                                    SQLiteDatabase sqlDB = listSQLHelper.getWritableDatabase();
+                                    todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
+                                    SQLiteDatabase sqlDB = todoListSQLHelper.getWritableDatabase();
                                     sqlDB.execSQL(deleteTodoItemSql);
                                     updateTodoList();
 
@@ -157,8 +198,8 @@ public class MainActivity extends ActionBarActivity
             list.add("New Item");
             adapter.notifyDataSetChanged();
 
-            listSQLHelper = new ListSQLHelper(MainActivity.this);
-            SQLiteDatabase sqLiteDatabase = listSQLHelper.getWritableDatabase();
+            todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
+            SQLiteDatabase sqLiteDatabase = todoListSQLHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.clear();
 
@@ -169,24 +210,24 @@ public class MainActivity extends ActionBarActivity
             String testeroonee = "Zone: " + String.valueOf(zone) + " | Minor: " + String.valueOf(minor);
 
             // String que se despliega en la lista
-            values.put(ListSQLHelper.COL1_TASK, testeroonee);
+            values.put(TodoListSQLHelper.COL1_TASK, testeroonee);
 
             // ZONE
-            values.put(ListSQLHelper.ZONE, zone);
+            values.put(TodoListSQLHelper.ZONE, zone);
 
             // MAJOR
-            values.put(ListSQLHelper.MAJOR, major);
+            values.put(TodoListSQLHelper.MAJOR, major);
 
             // MINOR
-            values.put(ListSQLHelper.MINOR, minor);
+            values.put(TodoListSQLHelper.MINOR, minor);
 
             // X POS
-            values.put(ListSQLHelper.X, x);
+            values.put(TodoListSQLHelper.X, x);
 
             // Y POS
-            values.put(ListSQLHelper.Y, y);
+            values.put(TodoListSQLHelper.Y, y);
 
-            sqLiteDatabase.insertWithOnConflict(ListSQLHelper.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+            sqLiteDatabase.insertWithOnConflict(TodoListSQLHelper.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
             updateTodoList();
         }
@@ -199,6 +240,55 @@ public class MainActivity extends ActionBarActivity
 
         updateTodoList();
     }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////// NETWORK ///////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Set the connectivity
+    public void connectivityState(boolean ans){
+        int size_table = db.getSize(SQLiteHelper.UPLOAD_PENDING);
+        //Message.message(getApplicationContext(), "UPLOAD: " + String.valueOf(size_table));
+        // Validate if there's connection to Internet
+        if (ans){
+            // Validate if there's any content on the table of database
+            if (size_table > 0){
+                // Send saved data to the server
+                sendUploadPendingProducts();
+            }
+            // Update the data of the list products
+            try {
+                db.deleteData(SQLiteHelper.PRODUCTS_LIST);
+                request.RequestProducts("listaProducto");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Network broadcast depending the version of Android
+    private void networkBroadcast() {
+        // Android Nougat
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+
+        // Android Marshmallow
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+    }
+
+    // Unregister possibly network changes
+    protected void unregisterNetworkChanges() {
+        try {
+            unregisterReceiver(networkReceiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     protected void onResume() {
@@ -338,25 +428,25 @@ public class MainActivity extends ActionBarActivity
         }
     }
     private void updateTodoList() {
-        listSQLHelper = new ListSQLHelper(MainActivity.this);
-        SQLiteDatabase sqLiteDatabase = listSQLHelper.getReadableDatabase();
+        todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
+        SQLiteDatabase sqLiteDatabase = todoListSQLHelper.getReadableDatabase();
 
         //cursor to read todo task list from database
-        Cursor cursor = sqLiteDatabase.query(ListSQLHelper.TABLE_NAME,
-                new String[]{ListSQLHelper._ID, ListSQLHelper.COL1_TASK},
+        Cursor cursor = sqLiteDatabase.query(TodoListSQLHelper.TABLE_NAME,
+                new String[]{TodoListSQLHelper._ID, TodoListSQLHelper.COL1_TASK},
                 null, null, null, null, null);
 
         //binds the todo task list with the UI
-        listAdapter = new SimpleCursorAdapter(
+        todoListAdapter = new SimpleCursorAdapter(
                 this,
                 R.layout.due,
                 cursor,
-                new String[]{ListSQLHelper.COL1_TASK},
+                new String[]{TodoListSQLHelper.COL1_TASK},
                 new int[]{R.id.due_text_view},
                 0
         );
 
-        myList.setAdapter(listAdapter);
+        myList.setAdapter(todoListAdapter);
     }
 
     //closing the todo task item
@@ -365,11 +455,11 @@ public class MainActivity extends ActionBarActivity
         TextView todoTV = (TextView) v.findViewById(R.id.due_text_view);
         String todoTaskItem = todoTV.getText().toString();
 
-        String deleteTodoItemSql = "DELETE FROM " + ListSQLHelper.TABLE_NAME +
-                " WHERE " + ListSQLHelper.COL1_TASK + " = '" + todoTaskItem + "'";
+        String deleteTodoItemSql = "DELETE FROM " + TodoListSQLHelper.TABLE_NAME +
+                " WHERE " + TodoListSQLHelper.COL1_TASK + " = '" + todoTaskItem + "'";
 
-        listSQLHelper = new ListSQLHelper(MainActivity.this);
-        SQLiteDatabase sqlDB = listSQLHelper.getWritableDatabase();
+        todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
+        SQLiteDatabase sqlDB = todoListSQLHelper.getWritableDatabase();
         sqlDB.execSQL(deleteTodoItemSql);
         updateTodoList();
         sqlDB.close();

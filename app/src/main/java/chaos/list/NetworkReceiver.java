@@ -19,9 +19,9 @@ public class NetworkReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         try {
             if (isNetworkAvailable(context)) {
-                new Tabs().connectivityState(true);
+                new MainActivity().connectivityState(true);
             } else {
-                new Tabs().connectivityState(false);
+                new MainActivity().connectivityState(false);
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
