@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
 
 public class TodoListSQLHelper extends SQLiteOpenHelper {
 
-    public static final String DB_NAME = "chaos.list.db";
+    public static final String DB_NAME = "warehouse2.list.db";
     public static final String TABLE_NAME = "LIST";
 
     public static final String COL1_TASK = "item";
@@ -29,7 +29,7 @@ public class TodoListSQLHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqlDB) {
         String createTodoListTable = "CREATE TABLE " + TABLE_NAME + " ( _id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COL1_TASK + " TEXT, " + UUID + " TEXT, " + MAJOR + " INTEGER, " + MINOR + " INTEGER, " + X + " REAL, " + Y + " REAL ," + ZONE + "INTEGER)";
+                COL1_TASK + " TEXT, " + UUID + " TEXT, " + MAJOR + " INTEGER, " + MINOR + " INTEGER, " + X + " REAL, " + Y + " REAL, " + ZONE + " INTEGER)";
         sqlDB.execSQL(createTodoListTable);
     }
 

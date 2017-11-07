@@ -44,12 +44,12 @@ public class beaconInfo extends AppCompatActivity {
                 String posyString = posyEt.getText().toString();
 
                 int zone = -1;
-                int posx = -1;
-                int posy = -1;
+                double posx = -1;
+                double posy = -1;
 
-                if (zoneString.length() >= 0) zone = Integer.parseInt(zoneString);
-                if (posxString.length() >= 0) zone = Integer.parseInt(posxString);
-                if (posyString.length() >= 0) zone = Integer.parseInt(posyString);
+                if (zoneString.length() > 0) zone = Integer.parseInt(zoneString);
+                if (posxString.length() > 0) posx = Double.parseDouble(posxString);
+                if (posyString.length() > 0) posy = Double.parseDouble(posyString);
 
                 intent.putExtra("zoneInt", zone);
                 intent.putExtra("minorInt", minor);

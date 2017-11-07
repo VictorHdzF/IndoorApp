@@ -65,6 +65,8 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -148,8 +150,8 @@ public class MainActivity extends ActionBarActivity
         final int zone = getIntent().getIntExtra("zoneInt", -1);
         final int minor = getIntent().getIntExtra("minorInt", -1);
         final int major = getIntent().getIntExtra("majorInt", -1);
-        final float x = getIntent().getFloatExtra("posxFloat", -1);
-        final float y = getIntent().getFloatExtra("posyFloat", -1);
+        final double x = getIntent().getDoubleExtra("posxFloat", -1.0);
+        final double y = getIntent().getDoubleExtra("posyFloat", -1.0);
 
         // Si tenemos una zona, entonces la agregamos a la lista
         if (zone != -1) {
