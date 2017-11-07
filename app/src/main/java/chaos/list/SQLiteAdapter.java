@@ -15,7 +15,7 @@ import java.util.Objects;
  */
 
 public class SQLiteAdapter {
-/*
+
     private ListSQLHelper myhelper;
     private static final String TAG = "Testing: ";
 
@@ -40,7 +40,7 @@ public class SQLiteAdapter {
 
         return id;
     }
-
+/*
     public String getData(){
         SQLiteDatabase db = myhelper.getWritableDatabase();
 
