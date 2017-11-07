@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -30,15 +31,24 @@ import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
 import com.estimote.coresdk.recognition.packets.Beacon;
 import com.estimote.coresdk.service.BeaconManager;
+import org.altbeacon.beacon.AltBeacon;
+//import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.BeaconConsumer;
+//import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.Identifier;
+import org.altbeacon.beacon.RangeNotifier;
+import org.altbeacon.beacon.Region;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, BeaconConsumer {
 
     //Create Objects.
     private ListView myList;
@@ -47,9 +57,9 @@ public class MainActivity extends ActionBarActivity
     private TodoListSQLHelper todoListSQLHelper;
 
     // Estimote SDK Objects for Ranging
-    private BeaconManager beaconManager;
+    private org.altbeacon.beacon.BeaconManager beaconManager;
     private BeaconRegion region;
-    private Beacon highestBeacon;
+    private org.altbeacon.beacon.Beacon highestBeacon;
 
 
 
@@ -70,13 +80,18 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        beaconManager = new BeaconManager(this);
-        EstimoteSDK.enableDebugLogging(true);
-        region = new BeaconRegion("ranged region", UUID.fromString("4e6ed5ab-b3ed-4e10-8247-c5f5524d4b21"), 12, null);
-
         closestBeaconTV = (TextView) findViewById(R.id.preview_beacon);
-        beaconManager.setForegroundScanPeriod(200,0);
-        beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener() {
+        beaconManager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(this);
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
+        beaconManager.bind(this);
+
+        //beaconManager = new org.altbeacon.beacon.BeaconManager(this);
+        //EstimoteSDK.enableDebugLogging(true);
+        //region = new BeaconRegion("ranged region", UUID.fromString("4e6ed5ab-b3ed-4e10-8247-c5f5524d4b21"), 12, null);
+
+        //beaconManager.setForegroundScanPeriod(200,0);
+        /*beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener() {
             @Override
             public void onBeaconsDiscovered(BeaconRegion region, List<Beacon> list) {
                 if (!list.isEmpty()) {
@@ -84,9 +99,9 @@ public class MainActivity extends ActionBarActivity
                     closestBeaconTV.setText("Minor: " + String.valueOf(highestBeacon.getMinor()) + "  RSSI: "  + String.valueOf(highestBeacon.getRssi()));
                 }
             }
-        });
+        });*/
 
-        beaconManager.startRanging(region);
+        //beaconManager.startRanging(region);
 
         myList = (ListView) findViewById(R.id.list);
         ImageButton fabImageButton = (ImageButton) findViewById(R.id.fab_image_button);
@@ -137,8 +152,8 @@ public class MainActivity extends ActionBarActivity
             public void onClick(View v) {
                 if (highestBeacon != null) {
                     Intent intent = new Intent(MainActivity.this, beaconInfo.class);
-                    int minor = highestBeacon.getMinor();
-                    int major = highestBeacon.getMajor();
+                    int minor = highestBeacon.getId3().toInt();
+                    int major = highestBeacon.getId2().toInt();
                     intent.putExtra("minorInt", minor);
                     intent.putExtra("majorInt", major);
                     startActivity(intent);
@@ -201,19 +216,48 @@ public class MainActivity extends ActionBarActivity
     protected void onResume() {
         super.onResume();
         SystemRequirementsChecker.checkWithDefaultDialogs(this);
-        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+        /*beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
             @Override
             public void onServiceReady() {
                 beaconManager.startRanging(region);
             }
-        });
+        });*/
     }
 
     // Template del SDK
     @Override
     protected void onPause() {
-        beaconManager.stopRanging(region);
+        //beaconManager.stopRanging(region);
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        beaconManager.unbind(this);
+    }
+
+    @Override
+    public void onBeaconServiceConnect() {
+        beaconManager.addRangeNotifier(new RangeNotifier() {
+            @Override
+            public void didRangeBeaconsInRegion(final Collection<org.altbeacon.beacon.Beacon> beacons, Region region) {
+                if (!beacons.isEmpty()) {
+                    highestBeacon = beacons.iterator().next();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (highestBeacon.getRssi() >= -50)
+                            closestBeaconTV.setText("Minor: " + highestBeacon.getId3() + "  RSSI: "  + highestBeacon.getRssi());
+                        }
+                    });
+                }
+            }
+        });
+
+        try {
+            beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", Identifier.parse("4e6ed5ab-b3ed-4e10-8247-c5f5524d4b21"), null, null));
+        } catch (RemoteException e) {    }
     }
 
     @Override
