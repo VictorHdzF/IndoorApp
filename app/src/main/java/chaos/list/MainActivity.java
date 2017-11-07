@@ -56,21 +56,15 @@ public class MainActivity extends ActionBarActivity
     private ListAdapter todoListAdapter;
     private TodoListSQLHelper todoListSQLHelper;
 
-    // Estimote SDK Objects for Ranging
+    // AltBeacon SDK Objects for Ranging
     private org.altbeacon.beacon.BeaconManager beaconManager;
-    private BeaconRegion region;
+    //private BeaconRegion region;
     private org.altbeacon.beacon.Beacon highestBeacon;
 
-
-
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
+    //Fragment managing the behaviors, interactions and presentation of the navigation drawer.
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
+    //Used to store the last screen title. For use in {@link #restoreActionBar()}.
     private CharSequence mTitle;
 
     @Override
@@ -86,12 +80,13 @@ public class MainActivity extends ActionBarActivity
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
         beaconManager.bind(this);
 
-        //beaconManager = new org.altbeacon.beacon.BeaconManager(this);
-        //EstimoteSDK.enableDebugLogging(true);
-        //region = new BeaconRegion("ranged region", UUID.fromString("4e6ed5ab-b3ed-4e10-8247-c5f5524d4b21"), 12, null);
+        /*
+        beaconManager = new org.altbeacon.beacon.BeaconManager(this);
+          EstimoteSDK.enableDebugLogging(true);
+          region = new BeaconRegion("ranged region", UUID.fromString("4e6ed5ab-b3ed-4e10-8247-c5f5524d4b21"), 12, null);
 
-        //beaconManager.setForegroundScanPeriod(200,0);
-        /*beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener() {
+         beaconManager.setForegroundScanPeriod(200,0);
+         beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener() {
             @Override
             public void onBeaconsDiscovered(BeaconRegion region, List<Beacon> list) {
                 if (!list.isEmpty()) {
@@ -99,9 +94,10 @@ public class MainActivity extends ActionBarActivity
                     closestBeaconTV.setText("Minor: " + String.valueOf(highestBeacon.getMinor()) + "  RSSI: "  + String.valueOf(highestBeacon.getRssi()));
                 }
             }
-        });*/
+        });
 
-        //beaconManager.startRanging(region);
+        beaconManager.startRanging(region);
+        */
 
         myList = (ListView) findViewById(R.id.list);
         ImageButton fabImageButton = (ImageButton) findViewById(R.id.fab_image_button);
@@ -142,9 +138,9 @@ public class MainActivity extends ActionBarActivity
 
                         });
         findViewById(R.id.list).setOnTouchListener(touchListener);
+
         // Setting this scroll listener is required to ensure that during ListView scrolling,
         // we don't look for swipes.
-
         // findViewById(R.id.list).setOnScrollListener(touchListener.makeScrollListener());
 
         fabImageButton.setOnClickListener(new View.OnClickListener() {
@@ -178,8 +174,10 @@ public class MainActivity extends ActionBarActivity
             ContentValues values = new ContentValues();
             values.clear();
 
-            //write the Todo task input into database table
-            // Todo aquí es donde tenemos que guardar todos lo valores relevantes en la base de datos
+            /*
+            write the Todo task input into database table
+            Todo aquí es donde tenemos que guardar todos lo valores relevantes en la base de datos
+            */
             String testeroonee = "Zone: " + String.valueOf(zone) + " | Minor: " + String.valueOf(minor);
 
             // String que se despliega en la lista
@@ -205,9 +203,11 @@ public class MainActivity extends ActionBarActivity
             updateTodoList();
         }
 
-        //show the ListView on the screen
-        // The adapter MyCustomAdapter is responsible for maintaining the data backing this list and for producing
-        // a view to represent an item in that data set.
+        /*
+        show the ListView on the screen
+        The adapter MyCustomAdapter is responsible for maintaining the data backing this list and for producing
+        a view to represent an item in that data set.
+        */
 
         updateTodoList();
     }
@@ -237,6 +237,7 @@ public class MainActivity extends ActionBarActivity
         beaconManager.unbind(this);
     }
 
+    // Beacon Ranging with specific Region UUID
     @Override
     public void onBeaconServiceConnect() {
         beaconManager.addRangeNotifier(new RangeNotifier() {
@@ -248,7 +249,7 @@ public class MainActivity extends ActionBarActivity
                         @Override
                         public void run() {
                             if (highestBeacon.getRssi() >= -50)
-                            closestBeaconTV.setText("Minor: " + highestBeacon.getId3() + "  RSSI: "  + highestBeacon.getRssi());
+                            closestBeaconTV.setText("Minor: " + highestBeacon.getId3().toString() + "  RSSI: "  + highestBeacon.getRssi());
                         }
                     });
                 }

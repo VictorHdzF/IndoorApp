@@ -15,7 +15,7 @@ public class About extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         aboutTV = (TextView) findViewById(R.id.about);
-        aboutTV.setText("La aplicación Warehouse Indoor esta enfocada a la configuración de los BLE Beacons Indoor de Estimote. \n"
+        aboutTV.setText("La aplicación Warehouse Indoor esta enfocada a la configuración de Bluetooth Beacons de Estimote y Kontakt. \n"
         );
     }
     @Override
