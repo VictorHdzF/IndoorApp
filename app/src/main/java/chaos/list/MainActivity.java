@@ -147,6 +147,10 @@ public class MainActivity extends ActionBarActivity
         // Aquí checamos si hay información en el intent, que quiere decir que venimos de beacon info
         final int zone = getIntent().getIntExtra("zoneInt", -1);
         final int minor = getIntent().getIntExtra("minorInt", -1);
+        final int major = getIntent().getIntExtra("majorInt", -1);
+        final float x = getIntent().getFloatExtra("posxFloat", -1);
+        final float y = getIntent().getFloatExtra("posyFloat", -1);
+
         // Si tenemos una zona, entonces la agregamos a la lista
         if (zone != -1) {
             list.add("New Item");
@@ -158,8 +162,27 @@ public class MainActivity extends ActionBarActivity
             values.clear();
 
             //write the Todo task input into database table
+            // Todo aquí es donde tenemos que guardar todos lo valores relevantes en la base de datos
             String testeroonee = "Zone: " + String.valueOf(zone) + " | Minor: " + String.valueOf(minor);
+
+            // String que se despliega en la lista
             values.put(TodoListSQLHelper.COL1_TASK, testeroonee);
+
+            // ZONE
+            values.put(TodoListSQLHelper.ZONE, zone);
+
+            // MAJOR
+            values.put(TodoListSQLHelper.MAJOR, major);
+
+            // MINOR
+            values.put(TodoListSQLHelper.MINOR, minor);
+
+            // X POS
+            values.put(TodoListSQLHelper.X, x);
+
+            // Y POS
+            values.put(TodoListSQLHelper.Y, y);
+
             sqLiteDatabase.insertWithOnConflict(TodoListSQLHelper.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
             updateTodoList();

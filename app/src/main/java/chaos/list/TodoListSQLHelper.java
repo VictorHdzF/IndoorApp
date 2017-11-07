@@ -9,9 +9,10 @@ public class TodoListSQLHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "chaos.list.db";
     public static final String TABLE_NAME = "LIST";
-    public static final String COL1_TASK = "item";
 
+    public static final String COL1_TASK = "item";
     public static final String UUID = "uuid";
+    public static final String ZONE = "zone";
     public static final String MAJOR = "major";
     public static final String MINOR = "minor";
     public static final String X = "x";
@@ -28,7 +29,7 @@ public class TodoListSQLHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqlDB) {
         String createTodoListTable = "CREATE TABLE " + TABLE_NAME + " ( _id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COL1_TASK + " TEXT, " + UUID + " TEXT, " + MAJOR + " INTEGER, " + MINOR + " INTEGER, " + X + " REAL, " + Y + " REAL)";
+                COL1_TASK + " TEXT, " + UUID + " TEXT, " + MAJOR + " INTEGER, " + MINOR + " INTEGER, " + X + " REAL, " + Y + " REAL ," + ZONE + "INTEGER)";
         sqlDB.execSQL(createTodoListTable);
     }
 
