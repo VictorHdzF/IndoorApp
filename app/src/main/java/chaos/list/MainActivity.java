@@ -51,6 +51,8 @@ public class MainActivity extends ActionBarActivity
     private BeaconRegion region;
     private Beacon highestBeacon;
 
+
+
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -68,19 +70,19 @@ public class MainActivity extends ActionBarActivity
 
         beaconManager = new BeaconManager(this);
         EstimoteSDK.enableDebugLogging(true);
-        region = new BeaconRegion("ranged region", UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), 12, null);
+        region = new BeaconRegion("ranged region", UUID.fromString("4e6ed5ab-b3ed-4e10-8247-c5f5524d4b21"), 12, null);
 
         closestBeaconTV = (TextView) findViewById(R.id.preview_beacon);
         beaconManager.setForegroundScanPeriod(200,0);
         beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener() {
             @Override
-        public void onBeaconsDiscovered(BeaconRegion region, List<Beacon> list) {
-            if (!list.isEmpty()) {
-                highestBeacon = list.get(0);
-                closestBeaconTV.setText("Minor: " + String.valueOf(highestBeacon.getMinor()) + "  RSSI: "  + String.valueOf(highestBeacon.getRssi()));
+            public void onBeaconsDiscovered(BeaconRegion region, List<Beacon> list) {
+                if (!list.isEmpty()) {
+                    highestBeacon = list.get(0);
+                    closestBeaconTV.setText("Minor: " + String.valueOf(highestBeacon.getMinor()) + "  RSSI: "  + String.valueOf(highestBeacon.getRssi()));
+                }
             }
-        }
-    });
+        });
 
         beaconManager.startRanging(region);
 
@@ -131,14 +133,37 @@ public class MainActivity extends ActionBarActivity
         fabImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, beaconInfo.class);
-                int minor = highestBeacon.getMinor();
-                int major = highestBeacon.getMajor();
-                intent.putExtra("minorInt", minor);
-                intent.putExtra("majorInt", major);
-                startActivity(intent);
+                if (highestBeacon != null) {
+                    Intent intent = new Intent(MainActivity.this, beaconInfo.class);
+                    int minor = highestBeacon.getMinor();
+                    int major = highestBeacon.getMajor();
+                    intent.putExtra("minorInt", minor);
+                    intent.putExtra("majorInt", major);
+                    startActivity(intent);
+                }
             }
         });
+
+        // Aquí checamos si hay información en el intent, que quiere decir que venimos de beacon info
+        final int zone = getIntent().getIntExtra("zoneInt", -1);
+        final int minor = getIntent().getIntExtra("minorInt", -1);
+        // Si tenemos una zona, entonces la agregamos a la lista
+        if (zone != -1) {
+            list.add("New Item");
+            adapter.notifyDataSetChanged();
+
+            todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
+            SQLiteDatabase sqLiteDatabase = todoListSQLHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.clear();
+
+            //write the Todo task input into database table
+            String testeroonee = "Zone: " + String.valueOf(zone) + " | Minor: " + String.valueOf(minor);
+            values.put(TodoListSQLHelper.COL1_TASK, testeroonee);
+            sqLiteDatabase.insertWithOnConflict(TodoListSQLHelper.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+
+            updateTodoList();
+        }
 
         //show the ListView on the screen
         // The adapter MyCustomAdapter is responsible for maintaining the data backing this list and for producing

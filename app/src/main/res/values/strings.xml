@@ -13,4 +13,17 @@
     <string name="title_activity_about">About</string>
 
     <string name="act_beacons">Beacon Information</string>
+    <string name="zone_input">Enter Zone</string>
+    <string name="zone_label">Zone:</string>
+    <string name="major_label">Major:</string>
+    <string name="minor_label">Minor:</string>
+    <string name="posx_label">Pos X:</string>
+    <string name="posy_label">Pos Y:</string>
+    <string name="posx_input">Enter X position</string>
+    <string name="posy_input">Enter Y position</string>
+    <string name="new_beacon_btn">New Beacon</string>
+    <string name="save_btn">Save</string>
+
+    <!-- Beacon Info -->
+
 </resources>
