@@ -1,9 +1,7 @@
 package chaos.list;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,20 +16,13 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.estimote.coresdk.common.config.EstimoteSDK;
 import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
-import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
-import com.estimote.coresdk.recognition.packets.Beacon;
-import com.estimote.coresdk.service.BeaconManager;
-import org.altbeacon.beacon.AltBeacon;
 //import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 //import org.altbeacon.beacon.BeaconManager;
@@ -39,12 +30,9 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 
 public class MainActivity extends ActionBarActivity
@@ -53,8 +41,8 @@ public class MainActivity extends ActionBarActivity
     //Create Objects.
     private ListView myList;
     private TextView closestBeaconTV;
-    private ListAdapter todoListAdapter;
-    private TodoListSQLHelper todoListSQLHelper;
+    private ListAdapter listAdapter;
+    private ListSQLHelper listSQLHelper;
 
     // AltBeacon SDK Objects for Ranging
     private org.altbeacon.beacon.BeaconManager beaconManager;
@@ -69,7 +57,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
+        listSQLHelper = new ListSQLHelper(MainActivity.this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -125,11 +113,11 @@ public class MainActivity extends ActionBarActivity
                             public void onDismiss(ListView listView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
 
-                                    String deleteTodoItemSql = "DELETE FROM " + TodoListSQLHelper.TABLE_NAME +
-                                            " WHERE " + TodoListSQLHelper._ID+ " = '" + todoListAdapter.getItemId(position) + "'";
+                                    String deleteTodoItemSql = "DELETE FROM " + ListSQLHelper.TABLE_NAME +
+                                            " WHERE " + ListSQLHelper._ID+ " = '" + listAdapter.getItemId(position) + "'";
 
-                                    todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
-                                    SQLiteDatabase sqlDB = todoListSQLHelper.getWritableDatabase();
+                                    listSQLHelper = new ListSQLHelper(MainActivity.this);
+                                    SQLiteDatabase sqlDB = listSQLHelper.getWritableDatabase();
                                     sqlDB.execSQL(deleteTodoItemSql);
                                     updateTodoList();
 
@@ -169,8 +157,8 @@ public class MainActivity extends ActionBarActivity
             list.add("New Item");
             adapter.notifyDataSetChanged();
 
-            todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
-            SQLiteDatabase sqLiteDatabase = todoListSQLHelper.getWritableDatabase();
+            listSQLHelper = new ListSQLHelper(MainActivity.this);
+            SQLiteDatabase sqLiteDatabase = listSQLHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.clear();
 
@@ -181,24 +169,24 @@ public class MainActivity extends ActionBarActivity
             String testeroonee = "Zone: " + String.valueOf(zone) + " | Minor: " + String.valueOf(minor);
 
             // String que se despliega en la lista
-            values.put(TodoListSQLHelper.COL1_TASK, testeroonee);
+            values.put(ListSQLHelper.COL1_TASK, testeroonee);
 
             // ZONE
-            values.put(TodoListSQLHelper.ZONE, zone);
+            values.put(ListSQLHelper.ZONE, zone);
 
             // MAJOR
-            values.put(TodoListSQLHelper.MAJOR, major);
+            values.put(ListSQLHelper.MAJOR, major);
 
             // MINOR
-            values.put(TodoListSQLHelper.MINOR, minor);
+            values.put(ListSQLHelper.MINOR, minor);
 
             // X POS
-            values.put(TodoListSQLHelper.X, x);
+            values.put(ListSQLHelper.X, x);
 
             // Y POS
-            values.put(TodoListSQLHelper.Y, y);
+            values.put(ListSQLHelper.Y, y);
 
-            sqLiteDatabase.insertWithOnConflict(TodoListSQLHelper.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+            sqLiteDatabase.insertWithOnConflict(ListSQLHelper.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
             updateTodoList();
         }
@@ -350,25 +338,25 @@ public class MainActivity extends ActionBarActivity
         }
     }
     private void updateTodoList() {
-        todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
-        SQLiteDatabase sqLiteDatabase = todoListSQLHelper.getReadableDatabase();
+        listSQLHelper = new ListSQLHelper(MainActivity.this);
+        SQLiteDatabase sqLiteDatabase = listSQLHelper.getReadableDatabase();
 
         //cursor to read todo task list from database
-        Cursor cursor = sqLiteDatabase.query(TodoListSQLHelper.TABLE_NAME,
-                new String[]{TodoListSQLHelper._ID, TodoListSQLHelper.COL1_TASK},
+        Cursor cursor = sqLiteDatabase.query(ListSQLHelper.TABLE_NAME,
+                new String[]{ListSQLHelper._ID, ListSQLHelper.COL1_TASK},
                 null, null, null, null, null);
 
         //binds the todo task list with the UI
-        todoListAdapter = new SimpleCursorAdapter(
+        listAdapter = new SimpleCursorAdapter(
                 this,
                 R.layout.due,
                 cursor,
-                new String[]{TodoListSQLHelper.COL1_TASK},
+                new String[]{ListSQLHelper.COL1_TASK},
                 new int[]{R.id.due_text_view},
                 0
         );
 
-        myList.setAdapter(todoListAdapter);
+        myList.setAdapter(listAdapter);
     }
 
     //closing the todo task item
@@ -377,11 +365,11 @@ public class MainActivity extends ActionBarActivity
         TextView todoTV = (TextView) v.findViewById(R.id.due_text_view);
         String todoTaskItem = todoTV.getText().toString();
 
-        String deleteTodoItemSql = "DELETE FROM " + TodoListSQLHelper.TABLE_NAME +
-                " WHERE " + TodoListSQLHelper.COL1_TASK + " = '" + todoTaskItem + "'";
+        String deleteTodoItemSql = "DELETE FROM " + ListSQLHelper.TABLE_NAME +
+                " WHERE " + ListSQLHelper.COL1_TASK + " = '" + todoTaskItem + "'";
 
-        todoListSQLHelper = new TodoListSQLHelper(MainActivity.this);
-        SQLiteDatabase sqlDB = todoListSQLHelper.getWritableDatabase();
+        listSQLHelper = new ListSQLHelper(MainActivity.this);
+        SQLiteDatabase sqlDB = listSQLHelper.getWritableDatabase();
         sqlDB.execSQL(deleteTodoItemSql);
         updateTodoList();
         sqlDB.close();

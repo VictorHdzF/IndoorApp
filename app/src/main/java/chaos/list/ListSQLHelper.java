@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
-public class TodoListSQLHelper extends SQLiteOpenHelper {
+public class ListSQLHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "warehouse2.list.db";
     public static final String TABLE_NAME = "LIST";
@@ -21,7 +21,7 @@ public class TodoListSQLHelper extends SQLiteOpenHelper {
 
     public static final String _ID = BaseColumns._ID;
 
-    public TodoListSQLHelper(Context context) {
+    public ListSQLHelper(Context context) {
         //1 is todo list database version
         super(context, DB_NAME, null, 1);
     }
