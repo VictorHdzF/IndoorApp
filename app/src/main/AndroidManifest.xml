@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="chaos.list">
+    package="mx.itesm.csf.indoorapp">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -8,13 +8,15 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     //For Android 6.0+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher_indoor"
         android:label="@string/app_name"
+        android:roundIcon="@drawable/ic_launcher_indoor"
+        android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".Splash"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -33,16 +35,14 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name">
-        </activity>
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".beaconInfo"
-            android:label="@string/act_beacons">
-        </activity>
-        <activity
-            android:name=".About"
-            android:label="@string/title_activity_about">
-        </activity>
+            android:name=".BeaconInfo"
+            android:screenOrientation="portrait"
+            android:label="@string/act_beacons"/>
+
     </application>
 
 </manifest>

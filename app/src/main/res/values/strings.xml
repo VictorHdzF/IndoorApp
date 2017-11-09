@@ -24,7 +24,4 @@
     <string name="posy_input">Enter Y position</string>
     <string name="new_beacon_btn">New Beacon</string>
     <string name="save_btn">Save</string>
-
-    <!-- Beacon Info -->
-
 </resources>
