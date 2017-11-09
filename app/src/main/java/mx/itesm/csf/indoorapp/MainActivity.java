@@ -1,11 +1,8 @@
 package mx.itesm.csf.indoorapp;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,7 +33,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
     public static final String BASE_URL = "https://webservice-warehouse.run.aws-usw02-pr.ice.predix.io/index.php/";
     private RecyclerView mRecyclerView;
-    private ArrayList<Zone> mArrayList;
+    private ArrayList<Beacon> mArrayList;
     private DataAdapter mAdapter;
     Context context;
 
@@ -74,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     // Transform the response into JSONArray
                     JSONArray array = new JSONArray(response);
-                    ArrayList tempArrayList = new ArrayList<Zone>();
+                    ArrayList tempArrayList = new ArrayList<Beacon>();
 
                     // Go through every index of the array
                     // for reading the data and save it in the JSONObject
@@ -91,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                         String x = beacons.getString("x");
                         String y = beacons.getString("y");
 
-                        tempArrayList.add(new Zone(id, minor, major, x, y));
+                        tempArrayList.add(new Beacon(id, minor, major, x, y));
                     }
                     mArrayList = new ArrayList<>(tempArrayList);
                     Collections.sort(mArrayList);

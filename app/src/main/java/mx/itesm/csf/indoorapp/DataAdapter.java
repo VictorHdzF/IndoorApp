@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> implements Filterable {
-    private ArrayList<Zone> mArrayList;
-    private ArrayList<Zone> mFilteredList;
+    private ArrayList<Beacon> mArrayList;
+    private ArrayList<Beacon> mFilteredList;
     Context context;
 
-    public DataAdapter(ArrayList<Zone> arrayList, Context context) {
+    public DataAdapter(ArrayList<Beacon> arrayList, Context context) {
         mArrayList = arrayList;
         mFilteredList = arrayList;
         this.context = context;
@@ -54,8 +54,8 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> im
                 Gson gson = new Gson();
                 String beacon = gson.toJson(mFilteredList.get(i));
 
-                Intent intent = new Intent(context, BeaconInfo.class);
-                intent.putExtra("zone", beacon);
+                Intent intent = new Intent(context, BeaconInfoActivity.class);
+                intent.putExtra("beacon", beacon);
                 context.startActivity(intent);
             }
         });
@@ -80,18 +80,18 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> im
                     Collections.sort(mFilteredList);
                 } else {
 
-                    ArrayList<Zone> filteredList = new ArrayList<>();
+                    ArrayList<Beacon> filteredList = new ArrayList<>();
 
-                    for (Zone zone : mArrayList) {
+                    for (Beacon beacon : mArrayList) {
 
-                        if (zone.getId().toLowerCase().contains(charString) || zone.getX().toLowerCase().contains(charString) || zone.getY().toLowerCase().contains(charString) || zone.getMinor().toLowerCase().contains(charString)) {
-                            filteredList.add(zone);
+                        if (beacon.getId().toLowerCase().contains(charString) || beacon.getX().toLowerCase().contains(charString) || beacon.getY().toLowerCase().contains(charString) || beacon.getMinor().toLowerCase().contains(charString)) {
+                            filteredList.add(beacon);
                         }
 
                         // Condition added to display zones missing data if "missing" is typed in the search bar.
                         if (charString.equals("missing")) {
-                            if (zone.getMinor().equals("null") || zone.getX().equals("null") || zone.getY().equals("null")) {
-                                filteredList.add(zone);
+                            if (beacon.getMinor().equals("null") || beacon.getX().equals("null") || beacon.getY().equals("null")) {
+                                filteredList.add(beacon);
                             }
                         }
                     }
@@ -107,7 +107,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> im
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                mFilteredList = (ArrayList<Zone>) filterResults.values;
+                mFilteredList = (ArrayList<Beacon>) filterResults.values;
                 notifyDataSetChanged();
             }
         };

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="mx.itesm.csf.indoorapp.BeaconInfo">
+    tools:context="mx.itesm.csf.indoorapp.BeaconInfoActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,6 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
+            android:layout_marginEnd="40dp"
             android:ems="24"
             android:inputType="numberDecimal"
             android:textAlignment="center" />
@@ -54,6 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginEnd="40dp"
             android:ems="24"
             android:inputType="numberDecimal"
             android:textAlignment="center" />
@@ -80,6 +82,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginEnd="40dp"
             android:textAlignment="center"
             android:textSize="24sp" />
     </LinearLayout>
@@ -106,6 +109,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:ems="24"
+            android:layout_marginEnd="40dp"
             android:inputType="numberDecimal"
             android:textAlignment="center" />
 
@@ -131,7 +135,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginEnd="40dp"
             android:textAlignment="center"
             android:textSize="24sp" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/selectClosestBeaconButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:text="Select Closest Beacon" />
+
+    <Button
+        android:id="@+id/updateZoneButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="Update Zone" />
 </LinearLayout>

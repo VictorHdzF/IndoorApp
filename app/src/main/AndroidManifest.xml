@@ -39,7 +39,7 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".BeaconInfo"
+            android:name=".BeaconInfoActivity"
             android:screenOrientation="portrait"
             android:label="@string/act_beacons"/>
 
