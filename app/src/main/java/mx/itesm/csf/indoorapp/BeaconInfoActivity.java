@@ -7,7 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -26,23 +28,21 @@ import java.util.Collection;
 
 public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsumer {
 
+    Context context;
+    EditText minorEditText;
     Button updateZoneButton;
     Button selectClosestBeaconButton;
+    Button resetBeaconButton;
     RadioButton leftRadioButton;
     RadioButton rightRadioButton;
-    //TextView majorTextView;
-    EditText minorEditText;
     TextView beaconTextView;
-    Context context;
+    //TextView majorTextView;
 
-    // AltBeacon SDK Objects for Ranging
-    private Request request = new Request();
-    private BeaconManager beaconManager;
-    private org.altbeacon.beacon.Beacon highestBeacon;
-    private String position;
-    private String highestMinor;
-    private Beacon beacon;
-    private String minor;
+    private Beacon beacon;                                      // Beacon passed in as intentExtra
+    private String position;                                    // RadioButtonGroup value
+    private String highestMinor;                                // Closest beacon's MINOR
+    private Request request = new Request();                    // Requests to the server
+    private BeaconManager beaconManager;                        // Beacon SDK
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,37 +54,55 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
         Gson gson = new Gson();
         String strObj = getIntent().getStringExtra("beacon");
         beacon = gson.fromJson(strObj, Beacon.class);
-        minor = beacon.getMinor();
         position = beacon.getPosition();
 
         // Set the activity title
         getSupportActionBar().setTitle("Zone " + beacon.getId());
         initializeTextViews();
 
-        beaconTextView = findViewById(R.id.beaconTextView);
+        // Declare beacon region to be scanned
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
         beaconManager.bind(this);
 
-        updateZoneButton.setOnClickListener(new View.OnClickListener() {
+        // Sets the Beacon ID field = the closest beacon's MINOR
+        selectClosestBeaconButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // We check which values changed and we update only those
-                if (!minor.equals(minorEditText.getText().toString()) && minorEditText.getText().toString().length() > 0) {
-                    request.updateMinor(beacon.getId(), minorEditText.getText().toString(), context);
-                }
-
-                if (!position.equals(beacon.getPosition())) {
-                    request.updatePosition(beacon.getId(), position, context);
-                }
+            if (highestMinor.length() > 0) {
+                minorEditText.setText(highestMinor);
+            }
             }
         });
 
-        selectClosestBeaconButton.setOnClickListener(new View.OnClickListener() {
+        // Update zone's values on the server
+        // We check which values have changed and we update only those
+        updateZoneButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            if (highestBeacon.getId3().toString().length() > 0) {
-                minorEditText.setText(highestMinor);
+            if (!beacon.getMinor().equals(minorEditText.getText().toString()) && minorEditText.getText().toString().length() > 0) {
+                request.updateMinor(beacon.getId(), minorEditText.getText().toString(), context);
             }
+
+            if (!position.equals(beacon.getPosition())) {
+                request.updatePosition(beacon.getId(), position, context);
+            }
+            }
+        });
+
+        // Sets the zone's beacon's MINOR = null on the server
+        resetBeaconButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            request.updateMinor(beacon.getId(), "null", context);
+            }
+        });
+
+        // Touch Listener to hide keyboard if you press outside of an EditText
+        findViewById(R.id.linearLayout).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                return true;
             }
         });
     }
@@ -102,12 +120,12 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
             @Override
             public void didRangeBeaconsInRegion(final Collection<org.altbeacon.beacon.Beacon> beacons, Region region) {
             if (!beacons.isEmpty()) {
-                highestBeacon = beacons.iterator().next();
+                // We save the beacon closest to the device
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                    highestMinor = highestBeacon.getId3().toString();
-                    String display = "Minor: " + highestMinor + "  RSSI: "  + highestBeacon.getRssi();
+                    highestMinor = beacons.iterator().next().getId3().toString();
+                    String display = "Minor: " + highestMinor + "  RSSI: "  + beacons.iterator().next().getRssi();
                     beaconTextView.setText(display);
                     }
                 });
@@ -128,19 +146,21 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
         // Bind layout elements to variables
         //majorTextView = findViewById(R.id.majorTextView);
         minorEditText = findViewById(R.id.minorEditText);
-        updateZoneButton = findViewById(R.id.updateZoneButton);
-        selectClosestBeaconButton = findViewById(R.id.selectClosestBeaconButton);
+        beaconTextView = findViewById(R.id.beaconTextView);
         leftRadioButton = findViewById(R.id.left);
         rightRadioButton = findViewById(R.id.right);
+        updateZoneButton = findViewById(R.id.updateZoneButton);
+        resetBeaconButton = findViewById(R.id.resetBeaconButton);
+        selectClosestBeaconButton = findViewById(R.id.selectClosestBeaconButton);
 
         // Assign values
         //majorTextView.setText(beacon.getMajor().equals("null") ? missing : beacon.getMajor());          // MAJOR
-        minorEditText.setHint(beacon.getMinor().equals("null") ? missing : beacon.getMinor());          // MINOR
-
-        if (position.equals("Left")) leftRadioButton.setChecked(true);
-        if (position.equals("Right")) rightRadioButton.setChecked(true);
+        minorEditText.setHint(beacon.getMinor().equals("null") ? missing : beacon.getMinor());            // MINOR
+        if (position.equals("Left")) leftRadioButton.setChecked(true);                                    // LEFT
+        if (position.equals("Right")) rightRadioButton.setChecked(true);                                  // RIGHT
     }
 
+    // Read values from the RadioButtonGroup
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();

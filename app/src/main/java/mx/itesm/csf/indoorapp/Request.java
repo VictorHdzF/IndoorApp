@@ -130,8 +130,7 @@ public class Request {
                         //Message.message(context,"Minor Successfully Updated");
                         if (status.equals("030")) {
                             Message.message(context,"Error Updating ID: ID not available");
-                        }
-                        Message.message(context,"Error Updating ID " + status);
+                        } else Message.message(context,"Error Updating ID " + status);
                     }
 
                 } catch (JSONException e) {

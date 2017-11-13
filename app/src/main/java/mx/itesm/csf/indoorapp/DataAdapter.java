@@ -17,9 +17,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> implements Filterable {
+
+    private Context context;
     private ArrayList<Beacon> mArrayList;
     private ArrayList<Beacon> mFilteredList;
-    Context context;
 
     public DataAdapter(ArrayList<Beacon> arrayList, Context context) {
         mArrayList = arrayList;
@@ -41,7 +42,9 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> im
         String position = mFilteredList.get(i).getPosition();
         if (position.equals("null")) position = "<font color='#EE0000'>missing</font>";
 
-        viewHolder.tv_name.setText("Zone: " + mFilteredList.get(i).getId());
+        String display = "Zone: " + mFilteredList.get(i).getId();
+
+        viewHolder.tv_name.setText(display);
         viewHolder.tv_version.setText(Html.fromHtml("Beacon ID: " + minor));
         viewHolder.tv_api_level.setText(Html.fromHtml("Position: " + position));
 
@@ -114,12 +117,12 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> im
     public class ViewHolder extends RecyclerView.ViewHolder{
         private TextView tv_name,tv_version,tv_api_level;
 
-        public ViewHolder(View view) {
+        private ViewHolder(View view) {
             super(view);
 
-            tv_name = (TextView)view.findViewById(R.id.tv_name);
-            tv_version = (TextView)view.findViewById(R.id.tv_version);
-            tv_api_level = (TextView)view.findViewById(R.id.tv_api_level);
+            tv_name = view.findViewById(R.id.tv_name);
+            tv_version = view.findViewById(R.id.tv_version);
+            tv_api_level = view.findViewById(R.id.tv_api_level);
 
         }
     }
