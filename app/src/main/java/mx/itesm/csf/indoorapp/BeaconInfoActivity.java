@@ -26,6 +26,9 @@ import java.util.Collection;
 public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsumer {
 
     Beacon beacon;
+    String minor;
+    String posx;
+    String posy;
     Button updateZoneButton;
     Button selectClosestBeaconButton;
     TextView majorTextView;
@@ -39,6 +42,7 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
     // AltBeacon SDK Objects for Ranging
     private BeaconManager beaconManager;
     private org.altbeacon.beacon.Beacon highestBeacon;
+    String highestMinor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +54,12 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
         Gson gson = new Gson();
         String strObj = getIntent().getStringExtra("beacon");
         beacon = gson.fromJson(strObj, Beacon.class);
+        minor = beacon.getMinor();
+        posx = beacon.getX();
+        posy = beacon.getY();
 
         // Set the activity title
         getSupportActionBar().setTitle("Zone " + beacon.getId());
-
         initializeTextViews();
 
         beaconTextView = findViewById(R.id.beaconTextView);
@@ -65,25 +71,28 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
         updateZoneButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // We check which values changed and we update only those
-                if (!beacon.getMinor().equals(minorEditText.getText().toString())) {
-                    Log.d("BeaconInfoActivity", "MINORS are not the same");
-                    request.updateMinor(minorEditText.getText().toString(), beacon.getId(), context);
+                if (!minor.equals(minorEditText.getText().toString()) && minorEditText.getText().toString().length() > 0) {
+                    minor = minorEditText.getText().toString();
+                    request.updateMinor(beacon.getId(), minorEditText.getText().toString(), context);
                 }
 
-                if (!beacon.getX().equals(posxEditText.getText().toString())) {
-                    Log.d("BeaconInfoActivity", "POSX are not the same");
+                if (!posx.equals(posxEditText.getText().toString()) && posxEditText.getText().toString().length() > 0) {
+                    posx = posxEditText.getText().toString();
+                    request.updatePosx(beacon.getId(), posxEditText.getText().toString(), context);
                 }
 
-                if (!beacon.getY().equals(posyEditText.getText().toString())) {
-                    Log.d("BeaconInfoActivity", "POSY are not the same");
+                if (!posy.equals(posyEditText.getText().toString()) && posyEditText.getText().toString().length() > 0) {
+                    posy = posyEditText.getText().toString();
+                    request.updatePosy(beacon.getId(), posyEditText.getText().toString(), context);
                 }
             }
         });
 
         selectClosestBeaconButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // We check which values changed and we update only those
-
+            if (highestBeacon.getId3().toString().length() > 0) {
+                minorEditText.setText(highestMinor);
+            }
             }
         });
     }
@@ -100,16 +109,17 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
         beaconManager.addRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(final Collection<org.altbeacon.beacon.Beacon> beacons, Region region) {
-                if (!beacons.isEmpty()) {
-                    highestBeacon = beacons.iterator().next();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (highestBeacon.getRssi() >= -65)
-                                beaconTextView.setText("Minor: " + highestBeacon.getId3().toString() + "  RSSI: "  + highestBeacon.getRssi());
-                        }
-                    });
-                }
+            if (!beacons.isEmpty()) {
+                highestBeacon = beacons.iterator().next();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                    highestMinor = highestBeacon.getId3().toString();
+                    String display = "Minor: " + highestMinor + "  RSSI: "  + highestBeacon.getRssi();
+                    beaconTextView.setText(display);
+                    }
+                });
+            }
             }
         });
 

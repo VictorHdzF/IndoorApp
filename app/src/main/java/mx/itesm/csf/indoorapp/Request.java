@@ -52,15 +52,19 @@ public class Request {
                         // Save info of the array in the JSONObject
                         JSONObject beacons = (JSONObject) array.get(i);
 
-                        // Obtain the info inside of every
-                        // attribute inside of the object
-                        String minor = beacons.getString("minor");
-                        String major = beacons.getString("major");
-                        String id = beacons.getString("id");
-                        String x = beacons.getString("x");
-                        String y = beacons.getString("y");
+                        String has_beacon = beacons.getString("has_beacon");
 
-                        tempArrayList.add(new Beacon(id, minor, major, x, y));
+                        if (has_beacon.equals("t")) {
+                            // Obtain the info inside of every
+                            // attribute inside of the object
+                            String minor = beacons.getString("minor");
+                            String major = beacons.getString("major");
+                            String id = beacons.getString("id");
+                            String x = beacons.getString("x");
+                            String y = beacons.getString("y");
+
+                            tempArrayList.add(new Beacon(id, minor, major, x, y));
+                        }
                     }
                     mArrayList = new ArrayList<>(tempArrayList);
                     Collections.sort(mArrayList);
@@ -110,8 +114,8 @@ public class Request {
         });
     }
 
-    // Update MINOR of specific ID
-    public void updateMinor(final String minor, final String id, final Context context) {
+    // Update MINOR for specific ID
+    public void updateMinor(final String id, final String minor, final Context context) {
         RequestQueue queue = Volley.newRequestQueue(context);
         StringRequest sr = new StringRequest(com.android.volley.Request.Method.POST, BASE_URL, new Response.Listener<String>() {
 
@@ -123,8 +127,8 @@ public class Request {
                     JSONObject jsonResponse = new JSONObject(response);
                     status = jsonResponse.getString("status");
 
-                    if(status.equals("001")) Message.message(context,"Minor Successfully Updated");
-                    else Message.message(context,"Error During Update " + status);
+                    if(!status.equals("001")) //Message.message(context,"Minor Successfully Updated");
+                    Message.message(context,"Error Updating Minor " + status);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -143,6 +147,102 @@ public class Request {
                 params.put("id", id);
                 params.put("minor", minor);
                 params.put("s", "updateMinor");
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String encodedString = Base64.encodeToString(String.format("%s:%s", "app_client", "prueba123").getBytes(), Base64.NO_WRAP);
+                String infoAut = String.format("Basic %s", encodedString);
+                headers.put("Authorization", infoAut);
+                return headers;
+            }
+        };
+        queue.add(sr);
+    }
+
+    // Update POSX for specific ID
+    public void updatePosx(final String id, final String x, final Context context) {
+        RequestQueue queue = Volley.newRequestQueue(context);
+        StringRequest sr = new StringRequest(com.android.volley.Request.Method.POST, BASE_URL, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                try {
+                    // Go through every index of the array
+                    // for reading the data and save it in the JSONObject
+                    JSONObject jsonResponse = new JSONObject(response);
+                    status = jsonResponse.getString("status");
+
+                    if(!status.equals("001")) //Message.message(context,"Pos X Successfully Updated");
+                    Message.message(context,"Error Updating Pos X " + status);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                status = "100";
+                Message.message(context, "Error to connect (" + status + ")");
+            }
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<>();
+                params.put("id", id);
+                params.put("x", x);
+                params.put("s", "setX");
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String encodedString = Base64.encodeToString(String.format("%s:%s", "app_client", "prueba123").getBytes(), Base64.NO_WRAP);
+                String infoAut = String.format("Basic %s", encodedString);
+                headers.put("Authorization", infoAut);
+                return headers;
+            }
+        };
+        queue.add(sr);
+    }
+
+    // Update POSY for specific ID
+    public void updatePosy(final String id, final String y, final Context context) {
+        RequestQueue queue = Volley.newRequestQueue(context);
+        StringRequest sr = new StringRequest(com.android.volley.Request.Method.POST, BASE_URL, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                try {
+                    // Go through every index of the array
+                    // for reading the data and save it in the JSONObject
+                    JSONObject jsonResponse = new JSONObject(response);
+                    status = jsonResponse.getString("status");
+
+                    if(!status.equals("001")) //Message.message(context,"Pos Y Successfully Updated");
+                    Message.message(context,"Error Updating Pos Y " + status);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                status = "100";
+                Message.message(context, "Error to connect (" + status + ")");
+            }
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<>();
+                params.put("id", id);
+                params.put("y", y);
+                params.put("s", "setY");
                 return params;
             }
 
