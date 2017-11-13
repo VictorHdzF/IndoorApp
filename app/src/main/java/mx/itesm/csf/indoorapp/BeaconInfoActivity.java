@@ -5,6 +5,7 @@ import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -62,7 +63,17 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
         updateZoneButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // We check which values changed and we update only those
+                if (!beacon.getMinor().equals(minorEditText.getText().toString())) {
+                    Log.d("BeaconInfoActivity", "MINORS are not the same");
+                }
 
+                if (!beacon.getX().equals(posxEditText.getText().toString())) {
+                    Log.d("BeaconInfoActivity", "POSX are not the same");
+                }
+
+                if (!beacon.getY().equals(posyEditText.getText().toString())) {
+                    Log.d("BeaconInfoActivity", "POSY are not the same");
+                }
             }
         });
 
@@ -101,7 +112,9 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
 
         try {
             beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", Identifier.parse("4e6ed5ab-b3ed-4e10-8247-c5f5524d4b21"), null, null));
-        } catch (RemoteException e) {    }
+        } catch (RemoteException e) {
+            // catch error
+        }
     }
 
     public void initializeTextViews() {

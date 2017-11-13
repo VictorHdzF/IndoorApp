@@ -35,91 +35,28 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private ArrayList<Beacon> mArrayList;
     private DataAdapter mAdapter;
+    private Request request = new Request();
     Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         context = this;
 
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         initViews();
-        loadJSON();
+        request.getZones(this, mRecyclerView);
     }
 
     private void initViews(){
-        mRecyclerView = (RecyclerView)findViewById(R.id.card_recycler_view);
+        mRecyclerView = findViewById(R.id.card_recycler_view);
         mRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
-    }
-
-    // Make JSON array request with ([)
-    public void loadJSON() {
-        RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-
-        StringRequest sr = new StringRequest(com.android.volley.Request.Method.POST, BASE_URL, new com.android.volley.Response.Listener<String>() {
-
-            @Override
-            public void onResponse(String response) {
-                //Log.d("MainActivity", response);
-                try {
-                    // Transform the response into JSONArray
-                    JSONArray array = new JSONArray(response);
-                    ArrayList tempArrayList = new ArrayList<Beacon>();
-
-                    // Go through every index of the array
-                    // for reading the data and save it in the JSONObject
-                    for (int i = 0; i < array.length(); i++) {
-
-                        // Save info of the array in the JSONObject
-                        JSONObject beacons = (JSONObject) array.get(i);
-
-                        // Obtain the info inside of every
-                        // attribute inside of the object
-                        String minor = beacons.getString("minor");
-                        String major = beacons.getString("major");
-                        String id = beacons.getString("id");
-                        String x = beacons.getString("x");
-                        String y = beacons.getString("y");
-
-                        tempArrayList.add(new Beacon(id, minor, major, x, y));
-                    }
-                    mArrayList = new ArrayList<>(tempArrayList);
-                    Collections.sort(mArrayList);
-                    mAdapter = new DataAdapter(mArrayList, context);
-                    mRecyclerView.setAdapter(mAdapter);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d("MainActivity", "Error: " + error.getMessage());
-            }
-        }){
-            @Override
-            protected Map<String,String> getParams(){
-                Map<String,String> params = new HashMap<>();
-                params.put("s", "beacons");
-                return params;
-            }
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                String encodedString = Base64.encodeToString(String.format("%s:%s", "app_client", "prueba123").getBytes(), Base64.NO_WRAP);
-                String infoAut = String.format("Basic %s", encodedString);
-                headers.put("Authorization", infoAut);
-                return headers;
-            }
-        };
-        queue.add(sr);
     }
 
     @Override
