@@ -60,10 +60,9 @@ public class Request {
                             String minor = beacons.getString("minor");
                             String major = beacons.getString("major");
                             String id = beacons.getString("id");
-                            String x = beacons.getString("x");
-                            String y = beacons.getString("y");
+                            String position = beacons.getString("position");
 
-                            tempArrayList.add(new Beacon(id, minor, major, x, y));
+                            tempArrayList.add(new Beacon(id, minor, major, position));
                         }
                     }
                     mArrayList = new ArrayList<>(tempArrayList);
@@ -162,56 +161,8 @@ public class Request {
         queue.add(sr);
     }
 
-    // Update POSX for specific ID
-    public void updatePosx(final String id, final String x, final Context context) {
-        RequestQueue queue = Volley.newRequestQueue(context);
-        StringRequest sr = new StringRequest(com.android.volley.Request.Method.POST, BASE_URL, new Response.Listener<String>() {
-
-            @Override
-            public void onResponse(String response) {
-                try {
-                    // Go through every index of the array
-                    // for reading the data and save it in the JSONObject
-                    JSONObject jsonResponse = new JSONObject(response);
-                    status = jsonResponse.getString("status");
-
-                    if(!status.equals("001")) //Message.message(context,"Pos X Successfully Updated");
-                    Message.message(context,"Error Updating Pos X " + status);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                status = "100";
-                Message.message(context, "Error to connect (" + status + ")");
-            }
-        }){
-            @Override
-            protected Map<String,String> getParams(){
-                Map<String,String> params = new HashMap<>();
-                params.put("id", id);
-                params.put("x", x);
-                params.put("s", "setX");
-                return params;
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                String encodedString = Base64.encodeToString(String.format("%s:%s", "app_client", "prueba123").getBytes(), Base64.NO_WRAP);
-                String infoAut = String.format("Basic %s", encodedString);
-                headers.put("Authorization", infoAut);
-                return headers;
-            }
-        };
-        queue.add(sr);
-    }
-
-    // Update POSY for specific ID
-    public void updatePosy(final String id, final String y, final Context context) {
+    // Update POSITION for specific ID
+    public void updatePosition(final String id, final String position, final Context context) {
         RequestQueue queue = Volley.newRequestQueue(context);
         StringRequest sr = new StringRequest(com.android.volley.Request.Method.POST, BASE_URL, new Response.Listener<String>() {
 
@@ -224,7 +175,7 @@ public class Request {
                     status = jsonResponse.getString("status");
 
                     if(!status.equals("001")) //Message.message(context,"Pos Y Successfully Updated");
-                    Message.message(context,"Error Updating Pos Y " + status);
+                    Message.message(context,"Error Updating Position " + status);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -241,8 +192,8 @@ public class Request {
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<>();
                 params.put("id", id);
-                params.put("y", y);
-                params.put("s", "setY");
+                params.put("position", position);
+                params.put("s", "setPosition");
                 return params;
             }
 

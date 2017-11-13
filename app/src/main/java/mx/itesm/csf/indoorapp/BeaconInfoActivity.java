@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -25,24 +26,23 @@ import java.util.Collection;
 
 public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsumer {
 
-    Beacon beacon;
-    String minor;
-    String posx;
-    String posy;
     Button updateZoneButton;
     Button selectClosestBeaconButton;
+    RadioButton leftRadioButton;
+    RadioButton rightRadioButton;
     TextView majorTextView;
     EditText minorEditText;
-    EditText posxEditText;
-    EditText posyEditText;
     TextView beaconTextView;
     Context context;
-    private Request request = new Request();
 
     // AltBeacon SDK Objects for Ranging
+    private Request request = new Request();
     private BeaconManager beaconManager;
     private org.altbeacon.beacon.Beacon highestBeacon;
-    String highestMinor;
+    private String position;
+    private String highestMinor;
+    private Beacon beacon;
+    private String minor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +55,7 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
         String strObj = getIntent().getStringExtra("beacon");
         beacon = gson.fromJson(strObj, Beacon.class);
         minor = beacon.getMinor();
-        posx = beacon.getX();
-        posy = beacon.getY();
+        position = beacon.getPosition();
 
         // Set the activity title
         getSupportActionBar().setTitle("Zone " + beacon.getId());
@@ -72,18 +71,11 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
             public void onClick(View v) {
                 // We check which values changed and we update only those
                 if (!minor.equals(minorEditText.getText().toString()) && minorEditText.getText().toString().length() > 0) {
-                    minor = minorEditText.getText().toString();
                     request.updateMinor(beacon.getId(), minorEditText.getText().toString(), context);
                 }
 
-                if (!posx.equals(posxEditText.getText().toString()) && posxEditText.getText().toString().length() > 0) {
-                    posx = posxEditText.getText().toString();
-                    request.updatePosx(beacon.getId(), posxEditText.getText().toString(), context);
-                }
-
-                if (!posy.equals(posyEditText.getText().toString()) && posyEditText.getText().toString().length() > 0) {
-                    posy = posyEditText.getText().toString();
-                    request.updatePosy(beacon.getId(), posyEditText.getText().toString(), context);
+                if (!position.equals(beacon.getPosition())) {
+                    request.updatePosition(beacon.getId(), position, context);
                 }
             }
         });
@@ -136,15 +128,33 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
         // Bind layout elements to variables
         majorTextView = findViewById(R.id.majorTextView);
         minorEditText = findViewById(R.id.minorEditText);
-        posxEditText = findViewById(R.id.posxEditText);
-        posyEditText = findViewById(R.id.posyEditText);
         updateZoneButton = findViewById(R.id.updateZoneButton);
         selectClosestBeaconButton = findViewById(R.id.selectClosestBeaconButton);
+        leftRadioButton = findViewById(R.id.left);
+        rightRadioButton = findViewById(R.id.right);
 
         // Assign values
         majorTextView.setText(beacon.getMajor().equals("null") ? missing : beacon.getMajor());          // MAJOR
         minorEditText.setHint(beacon.getMinor().equals("null") ? missing : beacon.getMinor());          // MINOR
-        posxEditText.setHint(beacon.getX().equals("null") ? missing : beacon.getX());                   // X
-        posyEditText.setHint(beacon.getY().equals("null") ? missing : beacon.getY());                   // Y
+
+        if (position.equals("Left")) leftRadioButton.setChecked(true);
+        if (position.equals("Right")) rightRadioButton.setChecked(true);
+    }
+
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.left:
+                if (checked)
+                    position = "Left";
+                    break;
+            case R.id.right:
+                if (checked)
+                    position = "Right";
+                    break;
+        }
     }
 }

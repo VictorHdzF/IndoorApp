@@ -8,15 +8,13 @@ public class Beacon implements Comparable<Beacon> {
     private String id;
     private String minor;
     private String major;
-    private String x;
-    private String y;
+    private String position;
 
-    public Beacon(String id, String minor, String major, String x, String y) {
+    public Beacon(String id, String minor, String major, String position) {
         this.id = id;
         this.minor = minor;
         this.major = major;
-        this.x = x;
-        this.y = y;
+        this.position = position;
     }
 
     public String getId() {
@@ -31,12 +29,8 @@ public class Beacon implements Comparable<Beacon> {
         return major;
     }
 
-    public String getX() {
-        return x;
-    }
-
-    public String getY() {
-        return y;
+    public String getPosition() {
+        return position;
     }
 
     public int compareTo(Beacon o) {

@@ -38,15 +38,12 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> im
         String minor = mFilteredList.get(i).getMinor();
         if (minor.equals("null")) minor = "<font color='#EE0000'>missing</font>";
 
-        String x = mFilteredList.get(i).getX();
-        if (x.equals("null")) x = "<font color='#EE0000'>missing</font>";
-
-        String y = mFilteredList.get(i).getY();
-        if (y.equals("null")) y = "<font color='#EE0000'>missing</font>";
+        String position = mFilteredList.get(i).getPosition();
+        if (position.equals("null")) position = "<font color='#EE0000'>missing</font>";
 
         viewHolder.tv_name.setText("Zone: " + mFilteredList.get(i).getId());
         viewHolder.tv_version.setText(Html.fromHtml("Minor: " + minor));
-        viewHolder.tv_api_level.setText(Html.fromHtml("Pos X: " + x + "\t-\tPos Y: " + y));
+        viewHolder.tv_api_level.setText(Html.fromHtml("Position: " + position));
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,13 +81,14 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> im
 
                     for (Beacon beacon : mArrayList) {
 
-                        if (beacon.getId().toLowerCase().contains(charString) || beacon.getX().toLowerCase().contains(charString) || beacon.getY().toLowerCase().contains(charString) || beacon.getMinor().toLowerCase().contains(charString)) {
+                        if (beacon.getId().toLowerCase().contains(charString) || beacon.getMinor().toLowerCase().contains(charString)) {
                             filteredList.add(beacon);
                         }
 
                         // Condition added to display zones missing data if "missing" is typed in the search bar.
-                        if (charString.equals("missing")) {
-                            if (beacon.getMinor().equals("null") || beacon.getX().equals("null") || beacon.getY().equals("null")) {
+                        String missing = "missing";
+                        if (missing.contains(charString)) {
+                            if (beacon.getMinor().equals("null") || beacon.getPosition().equals("null")) {
                                 filteredList.add(beacon);
                             }
                         }
