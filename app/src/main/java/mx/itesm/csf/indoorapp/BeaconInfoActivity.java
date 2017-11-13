@@ -1,5 +1,6 @@
 package mx.itesm.csf.indoorapp;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
@@ -32,17 +33,18 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
     EditText posxEditText;
     EditText posyEditText;
     TextView beaconTextView;
-    public static final String BASE_URL = "https://webservice-warehouse.run.aws-usw02-pr.ice.predix.io/index.php/";
+    Context context;
+    private Request request = new Request();
 
     // AltBeacon SDK Objects for Ranging
     private BeaconManager beaconManager;
-    //private BeaconRegion region;
     private org.altbeacon.beacon.Beacon highestBeacon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_beacon_info);
+        context = this;
 
         // Parse beacon object
         Gson gson = new Gson();
@@ -65,6 +67,7 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
                 // We check which values changed and we update only those
                 if (!beacon.getMinor().equals(minorEditText.getText().toString())) {
                     Log.d("BeaconInfoActivity", "MINORS are not the same");
+                    request.updateMinor(minorEditText.getText().toString(), beacon.getId(), context);
                 }
 
                 if (!beacon.getX().equals(posxEditText.getText().toString())) {
