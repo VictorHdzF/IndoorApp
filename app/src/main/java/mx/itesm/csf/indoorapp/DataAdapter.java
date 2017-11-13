@@ -42,7 +42,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> im
         if (position.equals("null")) position = "<font color='#EE0000'>missing</font>";
 
         viewHolder.tv_name.setText("Zone: " + mFilteredList.get(i).getId());
-        viewHolder.tv_version.setText(Html.fromHtml("Minor: " + minor));
+        viewHolder.tv_version.setText(Html.fromHtml("Beacon ID: " + minor));
         viewHolder.tv_api_level.setText(Html.fromHtml("Position: " + position));
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {

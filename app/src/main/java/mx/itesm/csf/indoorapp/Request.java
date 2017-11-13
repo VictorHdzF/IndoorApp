@@ -126,8 +126,13 @@ public class Request {
                     JSONObject jsonResponse = new JSONObject(response);
                     status = jsonResponse.getString("status");
 
-                    if(!status.equals("001")) //Message.message(context,"Minor Successfully Updated");
-                    Message.message(context,"Error Updating Minor " + status);
+                    if(!status.equals("001")) {
+                        //Message.message(context,"Minor Successfully Updated");
+                        if (status.equals("030")) {
+                            Message.message(context,"Error Updating ID: ID not available");
+                        }
+                        Message.message(context,"Error Updating ID " + status);
+                    }
 
                 } catch (JSONException e) {
                     e.printStackTrace();

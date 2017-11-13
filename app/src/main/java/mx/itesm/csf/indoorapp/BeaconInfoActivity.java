@@ -30,7 +30,7 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
     Button selectClosestBeaconButton;
     RadioButton leftRadioButton;
     RadioButton rightRadioButton;
-    TextView majorTextView;
+    //TextView majorTextView;
     EditText minorEditText;
     TextView beaconTextView;
     Context context;
@@ -126,7 +126,7 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
         Spanned missing = Html.fromHtml("<font color='#EE0000'>missing</font>");
 
         // Bind layout elements to variables
-        majorTextView = findViewById(R.id.majorTextView);
+        //majorTextView = findViewById(R.id.majorTextView);
         minorEditText = findViewById(R.id.minorEditText);
         updateZoneButton = findViewById(R.id.updateZoneButton);
         selectClosestBeaconButton = findViewById(R.id.selectClosestBeaconButton);
@@ -134,7 +134,7 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
         rightRadioButton = findViewById(R.id.right);
 
         // Assign values
-        majorTextView.setText(beacon.getMajor().equals("null") ? missing : beacon.getMajor());          // MAJOR
+        //majorTextView.setText(beacon.getMajor().equals("null") ? missing : beacon.getMajor());          // MAJOR
         minorEditText.setHint(beacon.getMinor().equals("null") ? missing : beacon.getMinor());          // MINOR
 
         if (position.equals("Left")) leftRadioButton.setChecked(true);
