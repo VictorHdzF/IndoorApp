@@ -40,7 +40,7 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
 
     private Beacon beacon;                                      // Beacon passed in as intentExtra
     private String position;                                    // RadioButtonGroup value
-    private String highestMinor;                                // Closest beacon's MINOR
+    private String highestMinor = "";                                // Closest beacon's MINOR
     private Request request = new Request();                    // Requests to the server
     private BeaconManager beaconManager;                        // Beacon SDK
 
@@ -119,17 +119,28 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
         beaconManager.addRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(final Collection<org.altbeacon.beacon.Beacon> beacons, Region region) {
-            if (!beacons.isEmpty()) {
-                // We save the beacon closest to the device
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                    highestMinor = beacons.iterator().next().getId3().toString();
-                    String display = "Minor: " + highestMinor + "  RSSI: "  + beacons.iterator().next().getRssi();
-                    beaconTextView.setText(display);
-                    }
-                });
-            }
+                if (!beacons.isEmpty()) {
+                    // We save the beacon closest to the device
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            String newHighestMinor = beacons.iterator().next().getId3().toString();
+                            int highestRssi = beacons.iterator().next().getRssi();
+
+                            for (org.altbeacon.beacon.Beacon beacon : beacons) {
+                                if (beacon.getRssi() > highestRssi) {
+                                    newHighestMinor = beacon.getId3().toString();
+                                }
+                            }
+
+                            if (!highestMinor.equals(newHighestMinor)) highestMinor = newHighestMinor;
+
+                            String display = "ID: " + highestMinor + "  RSSI: "  + beacons.iterator().next().getRssi();
+                            beaconTextView.setText(display);
+                        }
+                    });
+                }
             }
         });
 
