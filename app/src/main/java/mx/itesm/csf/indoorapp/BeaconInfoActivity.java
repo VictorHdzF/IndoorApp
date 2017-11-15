@@ -92,7 +92,7 @@ public class BeaconInfoActivity extends AppCompatActivity implements BeaconConsu
         // Sets the zone's beacon's MINOR = null on the server
         resetBeaconButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            request.updateMinor(beacon.getId(), "null", context);
+            request.updateMinor(beacon.getId(), "n", context);
             }
         });
 

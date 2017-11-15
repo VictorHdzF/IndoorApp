@@ -147,5 +147,5 @@
         android:layout_marginStart="40dp"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="Reset Beacon" />
+        android:text="Reset Beacon ID" />
 </LinearLayout>
